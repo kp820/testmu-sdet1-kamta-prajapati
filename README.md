@@ -36,12 +36,27 @@ After a run with failures, check:
 ## Project structure
 
 ```
-tests/                      - pytest specs for Login, Dashboard, API
-src/ai_integration/
-  failure_explainer.py      - calls Gemini API with failure context, returns explanation + fix
-conftest.py                 - pytest hook that wires the explainer into every run
-prompts.md                  - raw LLM prompts used for Task 2 test generation
-ai-usage-log.md             - log of every AI tool used across the assignment
+testmu-sdet1-kamta-prajapati/
+├── tests/
+│   ├── login/
+│   │   └── test_login.py        # Login module - 5 test cases
+│   ├── dashboard/
+│   │   └── test_dashboard.py    # Dashboard module - 5 test cases
+│   └── api/
+│       └── test_api.py          # REST API module - 5 test cases
+├── src/
+│   └── ai_integration/
+│       └── failure_explainer.py # Calls Gemini API on test failure
+├── reports/
+│   ├── html-report.html         # Standard pytest HTML report
+│   └── ai-failure-report.json  # Gemini AI explanations per failure
+├── conftest.py                  # pytest hook wiring AI into test run
+├── prompts.md                   # Raw LLM prompts from Task 2
+├── ai-usage-log.md              # Every AI tool used across assessment
+├── requirements.txt
+├── pytest.ini
+├── .env.example
+└── README.md
 ```
 
 ## What I'd build next with more time
