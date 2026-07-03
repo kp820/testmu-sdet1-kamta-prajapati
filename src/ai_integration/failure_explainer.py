@@ -12,16 +12,28 @@ just guessing "flaky" every time. It also maps directly onto what a
 teammate actually wants at the moment a test goes red: "what broke and
 how do I fix it," not just a bucket label.
 
-This makes a REAL call to the Anthropic API - no mocking. Requires
-ANTHROPIC_API_KEY to be set in the environment (see .env.example).
+WHY GEMINI INSTEAD OF CLAUDE/OPENAI:
+The assignment requires a real, non-mocked LLM API call, but doesn't
+mandate a specific provider. Google's Gemini API has a genuine free
+tier (no credit card required), unlike the Anthropic and OpenAI APIs,
+so it was the practical choice for this assessment. The integration
+pattern (send failure context, parse a structured response) is
+identical across providers - swapping to Claude or GPT later is a
+small, isolated change to this file only.
+
+Requires GEMINI_API_KEY to be set in the environment (see .env.example).
+Get a free key at https://aistudio.google.com/apikey - no billing setup.
 """
 
 import os
 import re
 from dataclasses import dataclass
-from anthropic import Anthropic
+from google import genai
+from dotenv import load_dotenv
 
-_client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+load_dotenv()
+
+_client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
 
 
 @dataclass
@@ -55,13 +67,12 @@ Respond in exactly this format:
 EXPLANATION: <one or two plain-English sentences on what actually broke>
 SUGGESTED_FIX: <one or two concrete sentences on what to change, in the test or the app, to fix it>"""
 
-    response = _client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=400,
-        messages=[{"role": "user", "content": prompt}],
+    response = _client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
     )
 
-    text = "\n".join(block.text for block in response.content if block.type == "text")
+    text = response.text or ""
 
     explanation_match = re.search(r"EXPLANATION:\s*(.*)", text)
     fix_match = re.search(r"SUGGESTED_FIX:\s*(.*)", text)
